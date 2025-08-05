@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: estoque
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "
+        chown -R www-data:www-data /var/www/html &&
+        chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+        apache2-foreground
+      "
+    ports:
+      - "8000:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: estoque
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: estoque
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+
+volumes:
+  db-data:
