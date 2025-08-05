@@ -25,7 +25,7 @@
         </a>
         </div>
         <div class="col-md-3 text-center">
-        <a href="{{ route('requisicoes.create') }}" class="icon-link">
+        <a href="{{ route('requisicoes.criar') }}" class="icon-link">
             <i class="fas fa-plus-circle text-success"></i>
             <div>Nova Requisição</div>
         </a>

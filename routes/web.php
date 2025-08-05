@@ -20,7 +20,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Cliente/Admin
     Route::get('requisicoes', [RequisicaoController::class, 'index'])->name('requisicoes.index');
-    Route::get('requisicoes/criar', [RequisicaoController::class, 'create'])->name('requisicoes.create');
+    Route::get('requisicoes/criar', [RequisicaoController::class, 'criar'])->name('requisicoes.criar');
     Route::post('requisicoes', [RequisicaoController::class, 'store'])->name('requisicoes.store');
 
     // Funcionario/Gerente/Admin
