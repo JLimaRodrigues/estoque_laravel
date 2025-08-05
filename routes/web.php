@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\RequisicaoController;
+use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,9 +13,25 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::get('/cadastro', [RegisterController::class, 'cadastro'])->name('cadastro');
 Route::post('/registrar', [RegisterController::class, 'register'])->name('registrar');
-
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
-Auth::routes();
+Route::middleware(['auth'])->group(function () {
+
+    // Cliente/Admin
+    Route::get('/requisicoes', [RequisicaoController::class, 'index'])->name('requisicoes.index');
+    Route::get('/requisicoes/criar', [RequisicaoController::class, 'create'])->name('requisicoes.create');
+    Route::post('/requisicoes', [RequisicaoController::class, 'store'])->name('requisicoes.store');
+
+    // Funcionario/Gerente/Admin
+    Route::get('/requisicoes/saida', [RequisicaoController::class, 'saida'])->name('requisicoes.saida');
+    Route::post('/requisicoes/confirmar-saida/{id}', [RequisicaoController::class, 'confirmarSaida'])->name('requisicoes.confirmarSaida');
+
+    // Gerente/Admin
+    Route::get('/relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
+
+    // Admin
+    Route::get('/admin/usuarios', [AdminController::class, 'index'])->name('admin.usuarios');
+});
+
 
 Route::get('/home', 'HomeController@index')->name('home');

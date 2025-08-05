@@ -25,5 +25,8 @@ php artisan key:generate --force
 echo "Executando migrations..."
 php artisan migrate --force
 
+echo "Executando seeders..."
+php artisan db:seed --force
+
 echo "Ambiente Laravel pronto!"
 apache2-foreground

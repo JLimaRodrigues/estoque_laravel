@@ -26,7 +26,7 @@ class AddNivelPerfilToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn('nivel_perfil');
         });
     }
 }
