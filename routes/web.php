@@ -21,7 +21,7 @@ Route::middleware(['auth'])->group(function () {
     // Cliente/Admin
     Route::get('requisicoes', [RequisicaoController::class, 'index'])->name('requisicoes.index');
     Route::get('requisicoes/criar', [RequisicaoController::class, 'criar'])->name('requisicoes.criar');
-    Route::post('requisicoes', [RequisicaoController::class, 'store'])->name('requisicoes.store');
+    Route::post('requisicoes', [RequisicaoController::class, 'registrarRequisicao'])->name('requisicoes.registrar');
 
     // Funcionario/Gerente/Admin
     Route::get('requisicoes/saida', [RequisicaoController::class, 'saida'])->name('requisicoes.saida');

@@ -17,14 +17,12 @@ class CreateProdutosTable extends Migration
             $table->increments('id_produto');
             $table->string('nome_produto');
             $table->integer('quantidade')->default(0);
-            $table->decimal('custo', 8, 2);
+            $table->decimal('custo', 8, 2)->default(0);
             $table->decimal('valor', 8, 2);
             $table->unsignedInteger('tipo_produto_id');
-            $table->unsignedInteger('produto_pai_id')->nullable();
             $table->timestamps();
 
             $table->foreign('tipo_produto_id')->references('id_tipo_produto')->on('tipo_produto');
-            $table->foreign('produto_pai_id')->references('id_produto')->on('produtos');
         });
     }
 

@@ -23,22 +23,37 @@ class RequisicaoController extends Controller
         return view('requisicoes.criar', compact('produtos'));
     }
 
-    public function store(Request $request) {
+    public function registrarRequisicao(Request $request) {
         $request->validate([
-            'data' => 'required|date',
+            'itens' => 'required|json',
         ]);
 
-        Requisicao::create([
+        $itens = json_decode($request->itens, true);
+
+        if (empty($itens)) {
+            return redirect()->back()->withErrors(['itens' => 'Adicione pelo menos um item à requisição.']);
+        }
+
+        $requisicao = Requisicoes::create([
             'usuario_id' => Auth::id(),
-            'data' => $request->data,
-            'status' => 'pendente',
+            'data'       => now(),
+            'status'     => 'pendente',
         ]);
+
+        foreach ($itens as $item){
+            $requisicao->itens()->create([
+                'produto_id'     => $item['id'],
+                'quantidade'     => $item['qtd'],
+                'valor_unitario' => $item['valor']
+            ]);
+        }
 
         return redirect()->route('requisicoes.index')->with('status', 'Requisição criada com sucesso!');
     }
 
-    public function saida() {
-        $requisicoes = Requisicao::where('status', 'pendente')->get();
+    public function saida()
+    {
+        $requisicoes = Requisicoes::with('itens.produto')->where('status', 'pendente')->get();
         return view('requisicoes.saida', compact('requisicoes'));
     }
 

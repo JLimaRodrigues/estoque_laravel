@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content-child')
-    <form id="form-requisicao" action="{{ route('requisicoes.store') }}" method="POST">
+    <form id="form-requisicao" action="{{ route('requisicoes.registrar') }}" method="POST">
         @csrf
 
         <div class="row mb-4">
@@ -11,11 +11,11 @@
                     <option value="">Selecione um produto</option>
                     @foreach ($produtos as $produto)
                         <option 
-                            value="{{ $produto->id }}" 
-                            data-nome="{{ $produto->nome }}" 
-                            data-valor="{{ $produto->valor_unitario }}" 
+                            value="{{ $produto->id_produto }}" 
+                            data-nome="{{ $produto->nome_produto }}" 
+                            data-valor="{{ $produto->valor }}" 
                             data-estoque="{{ $produto->quantidade }}">
-                            {{ $produto->nome }}
+                            {{ $produto->nome_produto }}
                         </option>
                     @endforeach
                 </select>
@@ -68,7 +68,6 @@
         <input type="hidden" name="itens" id="itensJson">
 
         <div class="mt-4 d-flex justify-content-end">
-            <a href="{{ route('requisicoes.index') }}" class="btn btn-secondary me-2">Cancelar</a>
             <button type="submit" class="btn btn-success">Fazer Requisição</button>
         </div>
     </form>
@@ -138,7 +137,7 @@
     function renderizarTabela() {
         tabelaBody.innerHTML = '';
         let totalGeral = 0;
-        
+
         itens.forEach((item, index) => {
             tabelaBody.innerHTML += `
                 <tr>
