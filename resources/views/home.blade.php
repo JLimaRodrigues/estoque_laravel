@@ -1,46 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card">
-    <div class="card-header">Dashboard</div>
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+        Bem-vindo, <strong>{{ Auth::user()->name }}</strong> 
+        <span class="badge bg-secondary text-light ms-2">{{ Auth::user()->nivel_perfil }}</span>
+    </div>
+    <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="btn btn-sm btn-danger">Sair</button>
+    </form>
+    </div>
 
     <div class="card-body">
-        <h5>Bem-vindo, {{ Auth::user()->name }}!</h5>
-        <p>Perfil: <strong>{{ Auth::user()->nivel_perfil }}</strong></p>
+    <div class="row g-4 justify-content-center">
 
-        @php
-            $perfil = Auth::user()->nivel_perfil;
-        @endphp
-
-        @if ($perfil === 'cliente')
-            <ul>
-                <li><a href="{{ route('requisicoes.create') }}">Criar Requisição</a></li>
-                <li><a href="{{ route('requisicoes.index') }}">Minhas Requisições</a></li>
-            </ul>
-
-        @elseif ($perfil === 'funcionario')
-            <ul>
-                <li><a href="{{ route('requisicoes.saida') }}">Dar Saída em Materiais</a></li>
-            </ul>
-
-        @elseif ($perfil === 'gerente')
-            <ul>
-                <li><a href="{{ route('requisicoes.saida') }}">Dar Saída em Materiais</a></li>
-                <li><a href="{{ route('relatorios.index') }}">Relatórios Gerenciais</a></li>
-            </ul>
-
-        @elseif ($perfil === 'admin')
-            <ul>
-                <li><a href="{{ route('requisicoes.create') }}">Criar Requisição</a></li>
-                <li><a href="{{ route('requisicoes.index') }}">Minhas Requisições</a></li>
-                <li><a href="{{ route('requisicoes.saida') }}">Dar Saída em Materiais</a></li>
-                <li><a href="{{ route('relatorios.index') }}">Relatórios Gerenciais</a></li>
-                <li><a href="{{ route('admin.usuarios') }}">Gerenciar Usuários</a></li>
-            </ul>
-
-        @else
-            <p>Perfil desconhecido. Contate o administrador.</p>
+        {{-- Cliente e Admin --}}
+        @if(in_array(Auth::user()->nivel_perfil, ['cliente', 'admin']))
+        <div class="col-md-3 text-center">
+        <a href="{{ route('requisicoes.index') }}" class="icon-link">
+            <i class="fas fa-list-alt text-primary"></i>
+            <div>Minhas Requisições</div>
+        </a>
+        </div>
+        <div class="col-md-3 text-center">
+        <a href="{{ route('requisicoes.create') }}" class="icon-link">
+            <i class="fas fa-plus-circle text-success"></i>
+            <div>Nova Requisição</div>
+        </a>
+        </div>
         @endif
+
+        {{-- Funcionario, Gerente e Admin --}}
+        @if(in_array(Auth::user()->nivel_perfil, ['funcionario-comum', 'gerente', 'admin']))
+        <div class="col-md-3 text-center">
+        <a href="{{ route('requisicoes.saida') }}" class="icon-link">
+            <i class="fas fa-truck text-warning"></i>
+            <div>Saída de Material</div>
+        </a>
+        </div>
+        @endif
+
+        {{-- Gerente e Admin --}}
+        @if(in_array(Auth::user()->nivel_perfil, ['gerente', 'admin']))
+        <div class="col-md-3 text-center">
+        <a href="{{ route('relatorios.index') }}" class="icon-link">
+            <i class="fas fa-chart-line text-info"></i>
+            <div>Relatórios</div>
+        </a>
+        </div>
+        @endif
+
+        {{-- Apenas Admin --}}
+        @if(Auth::user()->nivel_perfil === 'admin')
+        <div class="col-md-3 text-center">
+        <a href="{{ route('admin.usuarios') }}" class="icon-link">
+            <i class="fas fa-users-cog text-danger"></i>
+            <div>Gerenciar Usuários</div>
+        </a>
+        </div>
+        @endif
+
+    </div>
     </div>
 </div>
 @endsection
