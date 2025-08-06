@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\{LoginController, RegisterController};
-use App\Http\Controllers\RequisicaoController;
-use App\Http\Controllers\RelatorioController;
-use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\{
+                            RequisicaoController,
+                            RelatorioController,
+                            AdminController,
+                            ProdutoController
+                        };
 Route::get('/', function () {
     // return view('welcome');
     return redirect('login');
@@ -24,10 +26,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('requisicoes', [RequisicaoController::class, 'registrarRequisicao'])->name('requisicoes.registrar');
 
     // Funcionario/Gerente/Admin
-    Route::get('requisicoes/saida', [RequisicaoController::class, 'saida'])->name('requisicoes.saida');
-    Route::post('requisicoes/confirmar-saida/{id}', [RequisicaoController::class, 'confirmarSaida'])->name('requisicoes.confirmarSaida');
+    Route::get('requisicoes/saida', [RequisicaoController::class, 'index'])->name('requisicoes.saida');
+    Route::get('requisicoes/auditar-saida/{id}', [RequisicaoController::class, 'auditarSaida'])->name('requisicoes.auditarSaida');
+    Route::put('requisicoes/confirmar-saida/{id}', [RequisicaoController::class, 'confirmarSaida'])->name('requisicoes.confirmarSaida');
 
     // Gerente/Admin
+    Route::get('produtos', [ProdutoController::class, 'index'])->name('produtos.index');
     Route::get('relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
 
     // Admin

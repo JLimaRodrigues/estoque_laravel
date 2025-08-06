@@ -8,4 +8,9 @@ class ItensRequisicoes extends Model
 {
     protected $fillable = ['requisicao_id', 'produto_id', 'quantidade', 'valor_unitario'];
 
+    public function produto()
+    {
+        return $this->belongsTo(Produtos::class, 'produto_id', 'id_produto');
+    }
+
 }

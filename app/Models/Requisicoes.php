@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
 
 class Requisicoes extends Model
 {
@@ -10,14 +11,14 @@ class Requisicoes extends Model
 
     protected $fillable = ['usuario_id', 'entregador_id', 'data', 'status'];
 
-    public function requisicao()
+    public function cliente()
     {
-        return $this->belongsTo(Requisicoes::class, 'requisicao_id');
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
-    public function produto()
+    public function entregador()
     {
-        return $this->belongsTo(Produtos::class, 'produto_id');
+        return $this->belongsTo(User::class, 'entregador_id');
     }
 
     public function itens()

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{Requisicoes, Produtos};
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth, DB};
 
 
 class RequisicaoController extends Controller
@@ -13,7 +13,7 @@ class RequisicaoController extends Controller
         $usuario = Auth::user();
         $requisicoes = $usuario->nivel_perfil === 'cliente'
             ? Requisicoes::where('usuario_id', $usuario->id)->get()
-            : Requisicoes::all();
+            : Requisicoes::with(['itens.produto', 'cliente', 'entregador'])->get();
 
         return view('requisicoes.index', compact('requisicoes'));
     }
@@ -53,18 +53,44 @@ class RequisicaoController extends Controller
 
     public function saida()
     {
-        $requisicoes = Requisicoes::with('itens.produto')->where('status', 'pendente')->get();
-        return view('requisicoes.saida', compact('requisicoes'));
+        $requisicoes = Requisicoes::with(['itens.produto', 'usuario'])->get();
+        return view('requisicoes.index', compact('requisicoes'));
+    }
+
+    public function auditarSaida($id) {
+        $requisicao = Requisicoes::with(['itens.produto', 'cliente', 'entregador'])->find($id);
+
+        return view('requisicoes.auditarSaida', compact('requisicao'));
     }
 
     public function confirmarSaida($id) {
-        $requisicao = Requisicao::findOrFail($id);
+        $requisicao = Requisicoes::with('itens.produto')->findOrFail($id);
+
+        foreach ($requisicao->itens as $item) {
+            $produto = $item->produto;
+
+            if ($produto->tipo_produto_id == 2) {
+                $composicoes = DB::table('produto_composicao')->where('produto_composto_id', $produto->id_produto)->get();
+
+                foreach ($composicoes as $composicao) {
+                    $produtoSimples = \App\Models\Produtos::find($composicao->produto_simples_id);
+                    $quantidadeBaixa = $composicao->quantidade * $item->quantidade;
+                    $produtoSimples->quantidade -= $quantidadeBaixa;
+                    $produtoSimples->save();
+                }
+
+            } else {
+                $produto->quantidade -= $item->quantidade;
+                $produto->save();
+            }
+        }
+
         $requisicao->update([
             'status' => 'entregue',
             'entregador_id' => Auth::id()
         ]);
 
-        return redirect()->route('requisicoes.saida')->with('status', 'Requisição entregue!');
+        return redirect()->route('requisicoes.saida')->with('status', 'Requisição entregue e estoque atualizado.');
     }
 
 }

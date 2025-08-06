@@ -24,7 +24,7 @@
                 <input name="password" type="password" class="form-control" placeholder="Senha" required>
               </div>
               <button class="btn btn-primary w-100" type="submit">Entrar</button>
-              <p>Ainda não possui cadastro? <a href="{{ url('cadastro') }}">Cadastre-se</a></p>
+              <p>Ainda não possui cadastro? <a href="{{ route('cadastro') }}">Cadastre-se</a></p>
             </form>
           </div>
       </div>

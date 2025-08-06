@@ -16,49 +16,54 @@
     <div class="card-body">
     <div class="row g-4 justify-content-center">
 
-        {{-- Cliente e Admin --}}
         @if(in_array(Auth::user()->nivel_perfil, ['cliente', 'admin']))
         <div class="col-md-3 text-center">
-        <a href="{{ route('requisicoes.index') }}" class="icon-link">
-            <i class="fas fa-list-alt text-primary"></i>
-            <div>Minhas Requisições</div>
-        </a>
+            <a href="{{ route('requisicoes.index') }}" class="icon-link">
+                <i class="fas fa-list-alt text-primary"></i>
+                <div>Minhas Requisições</div>
+            </a>
         </div>
         <div class="col-md-3 text-center">
-        <a href="{{ route('requisicoes.criar') }}" class="icon-link">
-            <i class="fas fa-plus-circle text-success"></i>
-            <div>Nova Requisição</div>
-        </a>
+            <a href="{{ route('requisicoes.criar') }}" class="icon-link">
+                <i class="fas fa-plus-circle text-success"></i>
+                <div>Nova Requisição</div>
+            </a>
         </div>
         @endif
 
-        {{-- Funcionario, Gerente e Admin --}}
         @if(in_array(Auth::user()->nivel_perfil, ['funcionario-comum', 'gerente', 'admin']))
         <div class="col-md-3 text-center">
-        <a href="{{ route('requisicoes.saida') }}" class="icon-link">
-            <i class="fas fa-truck text-warning"></i>
-            <div>Saída de Material</div>
-        </a>
+            <a href="{{ route('requisicoes.saida') }}" class="icon-link">
+                <i class="fas fa-truck text-warning"></i>
+                <div>Saída de Material</div>
+            </a>
         </div>
         @endif
 
-        {{-- Gerente e Admin --}}
         @if(in_array(Auth::user()->nivel_perfil, ['gerente', 'admin']))
         <div class="col-md-3 text-center">
-        <a href="{{ route('relatorios.index') }}" class="icon-link">
-            <i class="fas fa-chart-line text-info"></i>
-            <div>Relatórios</div>
-        </a>
+            <a href="{{ route('produtos.index') }}" class="icon-link">
+                <i class="fas fa-truck text-success"></i>
+                <div>Produtos</div>
+            </a>
         </div>
         @endif
 
-        {{-- Apenas Admin --}}
+        @if(in_array(Auth::user()->nivel_perfil, ['gerente', 'admin']))
+        <div class="col-md-3 text-center">
+            <a href="{{ route('relatorios.index') }}" class="icon-link">
+                <i class="fas fa-chart-line text-info"></i>
+                <div>Relatórios</div>
+            </a>
+        </div>
+        @endif
+
         @if(Auth::user()->nivel_perfil === 'admin')
         <div class="col-md-3 text-center">
-        <a href="{{ route('admin.usuarios') }}" class="icon-link">
-            <i class="fas fa-users-cog text-danger"></i>
-            <div>Gerenciar Usuários</div>
-        </a>
+            <a href="{{ route('admin.usuarios') }}" class="icon-link">
+                <i class="fas fa-users-cog text-danger"></i>
+                <div>Gerenciar Usuários</div>
+            </a>
         </div>
         @endif
 
