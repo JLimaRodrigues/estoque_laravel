@@ -32,6 +32,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Gerente/Admin
     Route::get('produtos', [ProdutoController::class, 'index'])->name('produtos.index');
+    Route::get('produtos/novo', [ProdutoController::class, 'novoProduto'])->name('produtos.novo');
+    Route::post('produtos/criar', [ProdutoController::class, 'criar'])->name('produtos.criar');
+    Route::get('produtos/editar/{id}', [ProdutoController::class, 'editarProduto'])->name('produtos.editar');
+    Route::put('produtos/atualizar/{id}', [ProdutoController::class, 'atualizarProduto'])->name('produtos.atualizar');
+    Route::get('produtos/confirmar-exclusao/{id}', [ProdutoController::class, 'confirmarExclusao'])->name('produtos.confirmarExclusao');
+    Route::delete('produtos/deletar/{id}', [ProdutoController::class, 'deletar'])->name('produtos.deletar');
     Route::get('relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
 
     // Admin

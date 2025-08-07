@@ -1,168 +1,132 @@
 @extends('layouts.admin')
 
 @section('content-child')
-    <form id="form-requisicao" action="{{ route('requisicoes.registrar') }}" method="POST">
-        @csrf
+<form id="form-produto" action="{{ isset($produto) ? route('produtos.atualizar', $produto->id_produto) : route('produtos.criar') }}" method="POST">
+    @csrf
+    @if(isset($produto))
+        @method('PUT')
+    @endif
 
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <label>Produto</label>
-                <select id="produtoSelect" class="form-select">
-                    <option value="">Selecione um produto</option>
-                    @foreach ($produtos as $produto)
-                        <option 
-                            value="{{ $produto->id_produto }}" 
-                            data-nome="{{ $produto->nome_produto }}" 
-                            data-valor="{{ $produto->valor }}" 
-                            data-estoque="{{ $produto->quantidade }}">
-                            {{ $produto->nome_produto }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-2">
-                <label>Nome</label>
-                <input type="text" id="produtoNome" class="form-control" readonly>
-            </div>
-
-            <div class="col-md-2">
-                <label>Qtd</label>
-                <input type="number" id="produtoQtd" class="form-control" min="1">
-            </div>
-
-            <div class="col-md-2">
-                <label>Valor</label>
-                <input type="text" id="produtoValor" class="form-control" readonly>
-            </div>
-
-            <div class="col-md-2">
-                <label>Total</label>
-                <input type="text" id="produtoTotal" class="form-control" readonly>
-            </div>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label>Tipo de Produto</label>
+            <select name="tipo_produto_id" id="tipo_produto" class="form-control" required>
+                <option value="">Selecione</option>
+                @foreach($tiposProduto as $tipo)
+                    <option value="{{ $tipo->id_tipo_produto }}" {{ isset($produto) && $produto->tipo_produto_id == $tipo->id_tipo_produto ? 'selected' : '' }}>
+                        {{ $tipo->tipo }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="mb-3">
-            <button type="button" class="btn btn-primary" onclick="adicionarItem()">Adicionar</button>
+        <div class="col-md-3">
+            <label>Nome</label>
+            <input type="text" name="nome_produto" class="form-control" value="{{ $produto->nome_produto ?? '' }}" required>
         </div>
 
-        <table class="table table-bordered" id="tabelaProdutos">
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Qtd</th>
-                    <th>Valor Unitário</th>
-                    <th>Total</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3" class="text-end"><strong>Total Geral:</strong></td>
-                    <td colspan="2" id="totalGeral" class="fw-bold">R$ 0,00</td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <input type="hidden" name="itens" id="itensJson">
-
-        <div class="mt-4 d-flex justify-content-end">
-            <button type="submit" class="btn btn-success">Fazer Requisição</button>
+        <div class="col-md-2">
+            <label>Quantidade</label>
+            <input type="number" name="quantidade" id="quantidade" class="form-control" min="0" value="{{ $produto->quantidade ?? 0 }}" required>
         </div>
-    </form>
-@endsection
 
-@push('scripts')
+        <div class="col-md-2">
+            <label>Custo</label>
+            <input type="text" name="custo" class="form-control mask-decimal" value="{{ old('custo', isset($produto) ? number_format($produto->custo, 2, ',', '') : '') }}">
+        </div>
+
+        <div class="col-md-2">
+            <label>Valor</label>
+            <input type="text" name="valor" class="form-control mask-decimal" value="{{ old('valor', isset($produto) ? number_format($produto->valor, 2, ',', '') : '') }}">
+        </div>
+    </div>
+
+    <div id="composicao-section" style="display: none">
+        <hr>
+        <h5>Composição do Produto</h5>
+        <div id="composicao-itens">
+            @if(isset($produto->composicao))
+                @foreach($produto->composicao as $i => $comp)
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <select name="composicao[{{ $i }}][produto_simples_id]" class="form-control">
+                                @foreach($produtosSimples as $ps)
+                                    <option value="{{ $ps->id_produto }}" {{ $comp->produto_simples_id == $ps->id_produto ? 'selected' : '' }}>{{ $ps->nome_produto }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" name="composicao[{{ $i }}][quantidade]" class="form-control" value="{{ $comp->quantidade }}" min="1">
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+        <button type="button" id="add-item" class="btn btn-sm btn-secondary">Adicionar Item</button>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+        <button type="submit" class="btn btn-success">{{ isset($produto) ? 'Atualizar' : 'Criar' }}</button>
+    </div>
+</form>
+
 <script>
-    let itens = [];
+    document.addEventListener('DOMContentLoaded', () => {
+        const tipoProduto       = document.getElementById('tipo_produto');
+        const custoInput        = document.getElementById('custo');
+        const composicaoSection = document.getElementById('composicao-section');
+        const composicaoItens   = document.getElementById('composicao-itens');
+        const addItemBtn        = document.getElementById('add-item');
 
-    const selectProduto = document.getElementById('produtoSelect');
-    const inputNome = document.getElementById('produtoNome');
-    const inputQtd = document.getElementById('produtoQtd');
-    const inputValor = document.getElementById('produtoValor');
-    const inputTotal = document.getElementById('produtoTotal');
-    const tabelaBody = document.querySelector('#tabelaProdutos tbody');
-    const hiddenInput = document.getElementById('itensJson');
-
-    selectProduto.addEventListener('change', () => {
-        const option = selectProduto.options[selectProduto.selectedIndex];
-        inputNome.value = option.dataset.nome || '';
-        inputValor.value = option.dataset.valor || '';
-        inputQtd.value = 1;
-        calcularTotal();
-    });
-
-    inputQtd.addEventListener('input', calcularTotal);
-
-    function calcularTotal() {
-        const valor = parseFloat(inputValor.value);
-        const qtd = parseInt(inputQtd.value);
-        if (!isNaN(valor) && !isNaN(qtd)) {
-            inputTotal.value = (valor * qtd).toFixed(2);
-        } else {
-            inputTotal.value = '';
-        }
-    }
-
-    function adicionarItem() {
-        const id = selectProduto.value;
-        const nome = inputNome.value;
-        const valor = parseFloat(inputValor.value);
-        const qtd = parseInt(inputQtd.value);
-        const total = parseFloat(inputTotal.value);
-
-        if (!id || isNaN(qtd) || qtd < 1 || isNaN(valor)) {
-            alert('Preencha corretamente os campos.');
-            return;
-        }
-
-        const estoque = parseInt(selectProduto.options[selectProduto.selectedIndex].dataset.estoque);
-        if (qtd > estoque) {
-            alert('Quantidade excede o estoque disponível.');
-            return;
-        }
-
-        const item = { id, nome, qtd, valor, total };
-        itens.push(item);
-        renderizarTabela();
-        limparCampos();
-    }
-
-    function removerItem(index) {
-        itens.splice(index, 1);
-        renderizarTabela();
-    }
-
-    function renderizarTabela() {
-        tabelaBody.innerHTML = '';
-        let totalGeral = 0;
-
-        itens.forEach((item, index) => {
-            tabelaBody.innerHTML += `
-                <tr>
-                    <td>${item.nome}</td>
-                    <td>${item.qtd}</td>
-                    <td>R$ ${item.valor.toFixed(2)}</td>
-                    <td>R$ ${item.total.toFixed(2)}</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removerItem(${index})">Remover</button>
-                    </td>
-                </tr>
-            `;
-            totalGeral += item.total;
+        tipoProduto.addEventListener('change', function () {
+            const isComposto = this.value == 2;
+            composicaoSection.style.display = isComposto ? 'block' : 'none';
+            custoInput.readOnly = isComposto;
         });
 
-        document.getElementById('totalGeral').innerText = `R$ ${totalGeral.toFixed(2)}`;
-        hiddenInput.value = JSON.stringify(itens);
-    }
+        addItemBtn?.addEventListener('click', () => {
+            const index = composicaoItens.children.length;
+            const itemHTML = `
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <select name="composicao[${index}][produto_simples_id]" class="form-control">
+                            @foreach($produtosSimples as $ps)
+                                <option value="{{ $ps->id_produto }}">{{ $ps->nome_produto }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="composicao[${index}][quantidade]" class="form-control" min="1">
+                    </div>
+                </div>`;
+            composicaoItens.insertAdjacentHTML('beforeend', itemHTML);
+        });
 
-    function limparCampos() {
-        selectProduto.value = '';
-        inputNome.value = '';
-        inputQtd.value = '';
-        inputValor.value = '';
-        inputTotal.value = '';
-    }
+        if (tipoProduto.value == 2) tipoProduto.dispatchEvent(new Event('change'));
+
+        document.querySelectorAll('.mask-decimal').forEach(function (input) {
+            input.addEventListener('input', function (e) {
+                let value = input.value;
+
+                value = value.replace(/[^\d,]/g, '');
+
+                const parts = value.split(',');
+                if (parts.length > 2) {
+                    value = parts[0] + ',' + parts[1];
+                }
+
+                input.value = value;
+            });
+
+            input.addEventListener('blur', function () {
+                let value = input.value.replace(',', '.');
+
+                if (!isNaN(value) && value !== '') {
+                    value = parseFloat(value).toFixed(2).replace('.', ',');
+                    input.value = value;
+                }
+            });
+        });
+    });
 </script>
-@endpush
+@endsection

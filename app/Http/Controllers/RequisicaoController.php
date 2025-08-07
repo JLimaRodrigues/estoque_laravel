@@ -57,13 +57,15 @@ class RequisicaoController extends Controller
         return view('requisicoes.index', compact('requisicoes'));
     }
 
-    public function auditarSaida($id) {
+    public function auditarSaida($id) 
+    {
         $requisicao = Requisicoes::with(['itens.produto', 'cliente', 'entregador'])->find($id);
 
         return view('requisicoes.auditarSaida', compact('requisicao'));
     }
 
-    public function confirmarSaida($id) {
+    public function confirmarSaida($id) 
+    {
         $requisicao = Requisicoes::with('itens.produto')->findOrFail($id);
 
         foreach ($requisicao->itens as $item) {

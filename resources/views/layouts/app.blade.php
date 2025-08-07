@@ -21,7 +21,7 @@
 
   <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="{{ url('/') }}">
         <i class="fa-solid fa-box"></i>
         Estoque
       </a>
