@@ -4,7 +4,7 @@ use App\Http\Controllers\Auth\{LoginController, RegisterController};
 use App\Http\Controllers\{
                             RequisicaoController,
                             RelatorioController,
-                            AdminController,
+                            UserController,
                             ProdutoController
                         };
 Route::get('/', function () {
@@ -42,7 +42,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
 
     // Admin
-    Route::get('admin/usuarios', [AdminController::class, 'index'])->name('admin.usuarios');
+    Route::get('usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('usuarios/novo', [UserController::class, 'novoUsuario'])->name('usuarios.novo');
+    Route::post('usuarios/criar', [UserController::class, 'criar'])->name('usuarios.criar');
+    Route::get('usuarios/editar/{id}', [UserController::class, 'editarUsuario'])->name('usuarios.editar');
+    Route::put('usuarios/atualizar/{id}', [UserController::class, 'atualizarUsuario'])->name('usuarios.atualizar');
+    Route::get('usuarios/confirmar-exclusao/{id}', [UserController::class, 'confirmarExclusao'])->name('usuarios.confirmarExclusao');
+    Route::delete('usuarios/deletar/{id}', [UserController::class, 'deletar'])->name('usuarios.deletar');
 });
 
 

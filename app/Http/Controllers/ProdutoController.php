@@ -21,7 +21,7 @@ class ProdutoController extends Controller
         $tiposProduto    = TipoProduto::all();
         $produtosSimples = Produtos::all();
 
-        return view('produtos.criar', compact('tiposProduto', 'produtosSimples'));
+        return view('produtos.form', compact('tiposProduto', 'produtosSimples'));
     }
 
     public function criar(Request $request)
@@ -49,7 +49,7 @@ class ProdutoController extends Controller
         $tiposProduto    = TipoProduto::all();
         $produtosSimples = Produtos::all();
 
-        return view('produtos.criar', compact('produto', 'tiposProduto', 'produtosSimples'));
+        return view('produtos.form', compact('produto', 'tiposProduto', 'produtosSimples'));
     }
 
     public function atualizarProduto(Request $request, $id)

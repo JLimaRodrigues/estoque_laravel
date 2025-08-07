@@ -60,7 +60,7 @@
 
         @if(Auth::user()->nivel_perfil === 'admin')
         <div class="col-md-3 text-center">
-            <a href="{{ route('admin.usuarios') }}" class="icon-link">
+            <a href="{{ route('usuarios.index') }}" class="icon-link">
                 <i class="fas fa-users-cog text-danger"></i>
                 <div>Gerenciar Usuários</div>
             </a>
