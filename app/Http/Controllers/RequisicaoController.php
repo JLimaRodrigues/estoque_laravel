@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\{Requisicoes, Produtos};
 use Illuminate\Support\Facades\{Auth, DB};
-
+use PDF;
+use Carbon\Carbon;
 
 class RequisicaoController extends Controller
 {
@@ -93,6 +94,15 @@ class RequisicaoController extends Controller
         ]);
 
         return redirect()->route('requisicoes.saida')->with('status', 'Requisição entregue e estoque atualizado.');
+    }
+
+    public function imprimirSaida($id)
+    {
+        $requisicao = Requisicoes::with(['itens.produto', 'cliente'])->findOrFail($id);
+    
+        $dataHoraSaida = Carbon::now()->format('d/m/Y H:i');
+    
+        return view("requisicoes.saidaPDF", compact('requisicao', 'dataHoraSaida'));
     }
 
 }

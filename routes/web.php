@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('requisicoes/saida', [RequisicaoController::class, 'index'])->name('requisicoes.saida');
     Route::get('requisicoes/auditar-saida/{id}', [RequisicaoController::class, 'auditarSaida'])->name('requisicoes.auditarSaida');
     Route::put('requisicoes/confirmar-saida/{id}', [RequisicaoController::class, 'confirmarSaida'])->name('requisicoes.confirmarSaida');
+    Route::get('requisicoes/imprimir-saida/{id}', [RequisicaoController::class, 'imprimirSaida'])->name('requisicoes.imprimirSaida');
 
     // Gerente/Admin
     Route::get('produtos', [ProdutoController::class, 'index'])->name('produtos.index');

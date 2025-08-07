@@ -40,6 +40,9 @@
                         <td>{{ ucfirst($requisicao->status) }}</td>
                         <td>
                             <a href="{{ route('requisicoes.auditarSaida', ['id' => $requisicao->id_requisicao]) }}" class="btn btn-sm btn-warning"><i class="fas fa-truck"></i> Dar saída</a>
+                            @if ($requisicao->status == 'entregue')
+                                <a href="{{ route('requisicoes.imprimirSaida', ['id' => $requisicao->id_requisicao]) }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-import"></i></i> Imprimir</a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
