@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('produtos/confirmar-exclusao/{id}', [ProdutoController::class, 'confirmarExclusao'])->name('produtos.confirmarExclusao');
     Route::delete('produtos/deletar/{id}', [ProdutoController::class, 'deletar'])->name('produtos.deletar');
     Route::get('relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
+    Route::get('relatorios/gerar', [RelatorioController::class, 'gerar'])->name('relatorios.gerar');
 
     // Admin
     Route::get('usuarios', [UserController::class, 'index'])->name('usuarios.index');

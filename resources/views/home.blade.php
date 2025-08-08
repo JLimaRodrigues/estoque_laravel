@@ -31,7 +31,7 @@
         </div>
         @endif
 
-        @if(in_array(Auth::user()->nivel_perfil, ['funcionario-comum', 'gerente', 'admin']))
+        @if(in_array(Auth::user()->nivel_perfil, ['funcionario', 'gerente', 'admin']))
         <div class="col-md-3 text-center">
             <a href="{{ route('requisicoes.saida') }}" class="icon-link">
                 <i class="fas fa-truck text-warning"></i>
