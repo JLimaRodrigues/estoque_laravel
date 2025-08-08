@@ -39,7 +39,19 @@ class ProdutoController extends Controller
             'valor'           => 'required|numeric|min:0',
         ])->validate();
 
-        Produtos::create($validado);
+        $produto = Produtos::create($validado);
+
+        if ($produto->tipo_produto_id == 2 && $request->has('composicao')) {
+            foreach ($request->composicao as $comp) {
+                ProdutoComposicao::create([
+                    'produto_composto_id' => $produto->id_produto,
+                    'produto_simples_id'  => $comp['produto_simples_id'],
+                    'quantidade'          => $comp['quantidade'],
+                ]);
+            }
+
+            $produto->update(['custo' => $produto->calcularCustoComposto()]);
+        }
         return redirect()->route('produtos.index')->with('success', 'Produto criado com sucesso!');
     }
 
@@ -72,16 +84,23 @@ class ProdutoController extends Controller
 
         if ($request->input('tipo_produto_id') == 2) {
             $produto->composicao()->delete();
-            $produto->update(['custo' => 0]);
 
             if ($request->has('composicao')) {
+                $custoTotal = 0;
                 foreach ($request->composicao as $comp) {
                     ProdutoComposicao::create([
                         'produto_composto_id' => $produto->id_produto,
                         'produto_simples_id'  => $comp['produto_simples_id'],
                         'quantidade'          => $comp['quantidade'],
                     ]);
+
+                    $prodSimples = Produtos::find($comp['produto_simples_id']);
+                    if ($prodSimples) {
+                        $custoTotal += $prodSimples->custo * $comp['quantidade'];
+                    }
                 }
+
+                $produto->update(['custo' => $custoTotal]);
             }
         } else {
             $produto->composicao()->delete();
@@ -103,4 +122,5 @@ class ProdutoController extends Controller
 
         return redirect()->route('produtos.index')->with('success', 'Sucesso ao deletar registro!');
     }
+
 }

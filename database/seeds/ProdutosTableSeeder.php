@@ -48,7 +48,7 @@ class ProdutosTableSeeder extends Seeder
         $fardo = Produtos::create([
             'nome_produto' => 'REFRIGERANTE LATA 350ml - FARDO 12 UND',
             'quantidade' => 10,
-            'custo' => 0,
+            'custo' => 10.20,
             'valor' => 14.40,
             'tipo_produto_id' => 2
         ]);
@@ -62,7 +62,7 @@ class ProdutosTableSeeder extends Seeder
         $cesta = Produtos::create([
             'nome_produto' => 'CESTA BÁSICA PADRÃO',
             'quantidade' => 5,
-            'custo' => 0,
+            'custo' => 8.75,
             'valor' => 12.49,
             'tipo_produto_id' => 2
         ]);

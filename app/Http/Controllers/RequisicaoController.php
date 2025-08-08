@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Requisicoes, Produtos};
+use App\Models\{Requisicoes, Produtos, ProdutoComposicao};
 use Illuminate\Support\Facades\{Auth, DB};
 use PDF;
 use Carbon\Carbon;
@@ -42,14 +42,35 @@ class RequisicaoController extends Controller
         ]);
 
         foreach ($itens as $item){
+            $produto = Produtos::find($item['id']);
+            if (!$produto) {
+                continue;
+            }
+
+            $custoUnitario = null;
+            if ((int)$produto->tipo_produto_id === 1) {
+                $custoUnitario = $produto->custo;
+            } elseif ((int)$produto->tipo_produto_id === 2) {
+                $componentes = Produtos::with(['composicao'])->findOrFail($produto->id_produto);
+
+                $custoUnitario = 0;
+                foreach ($componentes->composicao as $componente) {
+                    $prodSimples = Produtos::find($componente->produto_simples_id);
+                    if ($prodSimples) {
+                        $custoUnitario += $prodSimples->custo * $componente->quantidade;
+                    }
+                }
+            }
+
             $requisicao->itens()->create([
                 'produto_id'     => $item['id'],
                 'quantidade'     => $item['qtd'],
-                'valor_unitario' => $item['valor']
+                'valor_unitario' => $item['valor'],
+                'custo_unitario' => $custoUnitario
             ]);
         }
 
-        return redirect()->route('requisicoes.index')->with('status', 'Requisição criada com sucesso!');
+        return redirect()->route('requisicoes.index')->with('success', 'Requisição criada com sucesso!');
     }
 
     public function saida()
@@ -93,7 +114,7 @@ class RequisicaoController extends Controller
             'entregador_id' => Auth::id()
         ]);
 
-        return redirect()->route('requisicoes.saida')->with('status', 'Requisição entregue e estoque atualizado.');
+        return redirect()->route('requisicoes.saida')->with('success', 'Requisição entregue e estoque atualizado.');
     }
 
     public function imprimirSaida($id)

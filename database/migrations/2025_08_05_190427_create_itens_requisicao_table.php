@@ -19,6 +19,7 @@ class CreateItensRequisicaoTable extends Migration
             $table->unsignedInteger('produto_id');
             $table->integer('quantidade');
             $table->decimal('valor_unitario', 8, 2);
+            $table->decimal('custo_unitario', 8, 2);
             $table->timestamps();
 
             $table->foreign('requisicao_id')->references('id_requisicao')->on('requisicoes')->onDelete('cascade');

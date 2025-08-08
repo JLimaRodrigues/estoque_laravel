@@ -35,4 +35,15 @@ class Produtos extends Model
         )->withPivot('quantidade')->withTimestamps();
     }
 
+    public function calcularCustoComposto()
+    {
+        $custo = 0;
+        foreach ($this->composicao as $componente) {
+            $produtoSimples = Produtos::find($componente->produto_simples_id);
+            if ($produtoSimples) {
+                $custo += $produtoSimples->custo * $componente->quantidade;
+            }
+        }
+        return $custo;
+    }
 }
