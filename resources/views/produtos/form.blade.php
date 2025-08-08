@@ -27,7 +27,7 @@
 
         <div class="col-md-2">
             <label>Quantidade</label>
-            <input type="number" name="quantidade" id="quantidade" class="form-control" min="0" value="{{ $produto->quantidade ?? 0 }}" required>
+            <input type="number" id="quantidade" class="form-control" min="0" value="{{ $produto->quantidade ?? 0 }}" disabled>
         </div>
 
         <div class="col-md-2">

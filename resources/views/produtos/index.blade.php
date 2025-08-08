@@ -4,7 +4,8 @@
 
 @include('resultado')
 
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-between">
+            <a href="{{ route('produtos.confirmarEntrada') }}" class="btn btn-secondary btn-sm">Registrar Entrada</a>
             <a href="{{ route('produtos.novo') }}" class="btn btn-success btn-sm">Criar Produto</a>
         </div>
     <table class="table table-striped table-bordered" id="tabela-produtos">

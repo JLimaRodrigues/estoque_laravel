@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Validator;
 use Illuminate\Http\Request;
-use App\Models\{Produtos, TipoProduto, ProdutoComposicao};
-use Illuminate\Support\Facades\Auth;
+use App\Models\{Produtos, TipoProduto, ProdutoComposicao, Entrada};
+use Illuminate\Support\Facades\{Auth, DB};
 
 
 class ProdutoController extends Controller
@@ -34,7 +34,6 @@ class ProdutoController extends Controller
         $validado = Validator::make($data, [
             'tipo_produto_id' => 'required|exists:tipo_produto,id_tipo_produto',
             'nome_produto'    => 'required|string|max:255',
-            'quantidade'      => 'required|integer|min:0',
             'custo'           => 'required|numeric|min:0',
             'valor'           => 'required|numeric|min:0',
         ])->validate();
@@ -75,7 +74,6 @@ class ProdutoController extends Controller
         $validado = Validator::make($data, [
             'tipo_produto_id' => 'required|exists:tipo_produto,id_tipo_produto',
             'nome_produto'    => 'required|string|max:255',
-            'quantidade'      => 'required|integer|min:0',
             'custo'           => 'required|numeric|min:0',
             'valor'           => 'required|numeric|min:0',
         ])->validate();
@@ -122,5 +120,67 @@ class ProdutoController extends Controller
 
         return redirect()->route('produtos.index')->with('success', 'Sucesso ao deletar registro!');
     }
+
+    public function confirmarEntrada()
+    {
+        $produtos = Produtos::all();
+        return view('produtos.confirmarEntrada', compact('produtos'));
+    }
+
+    //método de entrada usando calculo de média ponderada
+    public function registrarEntrada(Request $request)
+    {
+        $data = $request->validate([
+            'itens' => 'required|string',
+        ]);
+
+        $itens = json_decode($data['itens'], true);
+
+        if (!$itens || !is_array($itens) || count($itens) === 0) {
+            return back()->withErrors(['itens' => 'Nenhum item válido foi enviado.']);
+        }
+
+        DB::transaction(function() use ($itens) {
+            foreach ($itens as $item) {
+                if (!isset($item['id'], $item['qtd'], $item['custo'], $item['valor'])) {
+                    throw new \Exception('Dados incompletos para um dos itens.');
+                }
+
+                $produto = Produtos::findOrFail($item['id']);
+
+                Entrada::create([
+                    'produto_id'     => $produto->id_produto,
+                    'quantidade'     => $item['qtd'],
+                    'custo_unitario' => $item['custo'],
+                    'valor_unitario' => $item['valor'],
+                ]);
+
+                $quantidadeAntiga = $produto->quantidade;
+                $custoAntigo = $produto->custo;
+
+                $quantidadeNova = $item['qtd'];
+                $custoEntrada = $item['custo'];
+
+                $quantidadeTotal = $quantidadeAntiga + $quantidadeNova;
+
+                if ($quantidadeTotal > 0) {
+                    $custoMedio = (
+                        ($quantidadeAntiga * $custoAntigo) +
+                        ($quantidadeNova * $custoEntrada)
+                    ) / $quantidadeTotal;
+                } else {
+                    $custoMedio = 0;
+                }
+
+                $produto->quantidade = $quantidadeTotal;
+                $produto->custo = round($custoMedio, 2);
+                $produto->valor = $item['valor'];
+                $produto->save();
+            }
+        });
+
+        return redirect()->route('produtos.index')->with('success', 'Entrada registrada com sucesso e custo médio atualizado!');
+    }
+
 
 }

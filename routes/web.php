@@ -33,6 +33,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Gerente/Admin
     Route::get('produtos', [ProdutoController::class, 'index'])->name('produtos.index');
+    Route::get('produtos/confirmar-entrada', [ProdutoController::class, 'confirmarEntrada'])->name('produtos.confirmarEntrada');
+    Route::post('produtos/registrar-entrada', [ProdutoController::class, 'registrarEntrada'])->name('produtos.registrarEntrada');
     Route::get('produtos/novo', [ProdutoController::class, 'novoProduto'])->name('produtos.novo');
     Route::post('produtos/criar', [ProdutoController::class, 'criar'])->name('produtos.criar');
     Route::get('produtos/editar/{id}', [ProdutoController::class, 'editarProduto'])->name('produtos.editar');
